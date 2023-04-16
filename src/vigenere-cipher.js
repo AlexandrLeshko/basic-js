@@ -1,70 +1,39 @@
 const { NotImplementedError } = require('../extensions/index.js');
 
 class VigenereCipheringMachine {
-  constructor(isDirect = true) {
-    this.isDirect = isDirect;
-    this.alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    this.square = this.generateSquare();
+  constructor(direction = true) {
+    this['ALPHABET'] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    this.direction = direction;
+    this.encriptedLetter = this.getEncriptedLetter();
   }
-
-  generateSquare() {
-    const a = this.alphabet;
-    let square = [];
-    for (var i = 0; i < a.length; i++) {
-      square[i] = a.slice(i).concat(a.slice(0, i));
-    }
-
-    return square;
+  getEncriptedLetter() {
+    let alphabet = this['ALPHABET'];
+    let encriptedLetter = [];
+    for (let i = 0; i < alphabet.length; i++) encriptedLetter[i] = alphabet.slice(i).concat(alphabet.slice(0, i));
+    return encriptedLetter;
   }
-
-  encrypt(message, key) {
-    return this.crypt(message, key, true);
-  }
-
-  decrypt(message, key) {
-    return this.crypt(message, key, false);
-  }
-
-  crypt(message, key, encrypt) {
-    if (!message || !key) {
-      throw Error('Incorrect arguments!');
-    }
-
-    message = message.toUpperCase();
+  encrypt(msg, key) {return this.crypt(msg, key, true)};
+  decrypt(msg, key) {return this.crypt(msg, key, false);}
+  crypt(msg, key, encrypt) {
+    if (!msg || !key) throw Error('Incorrect arguments!');
+    msg = msg.toUpperCase();
     key = key.toUpperCase();
-
-    while (key.length < message.length) {
-      key += key;
-    }
-
+    while (key.length < msg.length) key += key;
     let result = '';
-    let keyIndex = 0;
-
-    for (let i = 0; i < message.length; i++) {
-      if (message[i] !== ' ' && this.alphabet.includes(message[i])) {
+    let index = 0;
+    for (let i = 0; i < msg.length; i++) {
+      if (msg[i] !== ' ' && this['ALPHABET'].includes(msg[i])) {
         if (encrypt) {
-          result +=
-            this.square[this.alphabet.indexOf(message[i])][
-            this.alphabet.indexOf(key[keyIndex])
-            ];
+          result += this.encriptedLetter[this['ALPHABET'].indexOf(msg[i])][this['ALPHABET'].indexOf(key[index])];
         } else {
-          result +=
-            this.alphabet[
-            this.square[this.alphabet.indexOf(key[keyIndex])].indexOf(
-              message[i]
-            )
-            ];
+          result += this['ALPHABET'][this.encriptedLetter[this['ALPHABET'].indexOf(key[index])].indexOf(msg[i])];
         }
-        keyIndex++;
+        index++;
       } else {
-        result += message[i];
+        result += msg[i];
       }
     }
-
-    if (!this.isDirect) {
-      return result.split('').reverse().join('');
-    }
-
+    if (!this.direction) {return result.split('').reverse().join('')};
     return result;
   }
 }
